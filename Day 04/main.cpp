@@ -61,7 +61,7 @@ class Board {
         bool partialHasWin(bool withRow) {
             for (int i = 0; i < BOARD_SIZE; i++) {
                 for (int j = 0; j < BOARD_SIZE; j++) {
-                    if (((this->cells[i][j].drawn && withRow) || (this->cells[j][i].drawn && !withRow)) && j == 4) {
+                    if (((this->cells[i][j].drawn && withRow) || (this->cells[j][i].drawn && !withRow)) && j == (BOARD_SIZE - 1)) {
                         return true;
                     } else if ((!this->cells[i][j].drawn && withRow) || (!this->cells[j][i].drawn && !withRow)) {
                         break;
