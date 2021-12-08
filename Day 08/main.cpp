@@ -42,34 +42,34 @@ int main() {
             input >> tmp;
 
             int *numbers = getNumbersWithXSegments(tmp.length());
-            bool *commonDigits = initializeArray(true, 7);
-            bool *commonDigitsCustomSchema = initializeArray(false, 7);
+            bool *commonSegments = initializeArray(true, 7);
+            bool *commonSegmentsCustomSchema = initializeArray(false, 7);
 
             int numberIndex = 0;
 
             while (numbers[numberIndex] != -1) {
-                bool *singleNumberDigits = initializeArray(false, 7);
+                bool *singlePatternSegments = initializeArray(false, 7);
                 string numberSegments = NUMBERS[numbers[numberIndex]];
 
                 for (int i = 0; i < numberSegments.length(); i++) {
-                    singleNumberDigits[getDigitIndex(numberSegments[i])] = true;
+                    singlePatternSegments[getDigitIndex(numberSegments[i])] = true;
                 }
 
                 for (int i = 0; i < 7; i++) {
-                    commonDigits[i] = commonDigits[i] && singleNumberDigits[i];
+                    commonSegments[i] = commonSegments[i] && singlePatternSegments[i];
                 }
 
                 numberIndex++;
             }
 
             for (int i = 0; i < tmp.length(); i++) {
-                commonDigitsCustomSchema[getDigitIndex(tmp[i])] = true;
+                commonSegmentsCustomSchema[getDigitIndex(tmp[i])] = true;
             }
 
             for (int i = 0; i < 7; i++) {
-                if (commonDigits[i]) {
+                if (commonSegments[i]) {
                     for (int j = 0; j < 7; j++) {
-                        validSegmentsMatch[i][j] = validSegmentsMatch[i][j] && commonDigitsCustomSchema[j];
+                        validSegmentsMatch[i][j] = validSegmentsMatch[i][j] && commonSegmentsCustomSchema[j];
                     }
                 }
             }
