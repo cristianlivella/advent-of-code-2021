@@ -48,8 +48,8 @@ int main() {
         }
     }
 
-    long long basinIndex = 1;
-    long long basinSizes[SIZE_X * SIZE_Y] = {};
+    int basinIndex = 1;
+    int basinSizes[SIZE_X * SIZE_Y] = {};
 
     for (int i = 0; i <SIZE_X; i++) {
         for (int j = 0; j < SIZE_Y; j++) {
@@ -96,7 +96,7 @@ int main() {
     basinSizes[0] = 0;
     basinSizes[1] = 0;
 
-    qsort(basinSizes, basinIndex, sizeof(long long), compare);
+    qsort(basinSizes, basinIndex, sizeof(int), compare);
 
     int multSize = 1;
     for (int i = 0; i < 3; i++) {
