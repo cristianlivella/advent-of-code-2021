@@ -1,6 +1,5 @@
 #include <fstream>
 #include <climits>
-#include <iostream>
 #include <math.h>
 
 using namespace std;
@@ -81,12 +80,12 @@ long binaryRangeToDecimal(char *stream, int start, int end, bool skipMultipleFiv
 PacketReturnData readPacket(char *stream, int start, int length) {
     int version = binaryRangeToDecimal(stream, start + 0, start + 2, false);
     int typeId = binaryRangeToDecimal(stream, start + 3, start + 5, false);
-    int headerLength = 0;
+    int headerLastBitIndex = 0;
 
     if (typeId == 4) {
-        headerLength = start + 5;
+        headerLastBitIndex = start + 5;
 
-        int pos = headerLength + 1;
+        int pos = headerLastBitIndex + 1;
 
         while (stream[pos] == '1') {
             pos += 5;
@@ -95,7 +94,7 @@ PacketReturnData readPacket(char *stream, int start, int length) {
         return PacketReturnData{
             .lastBitIndex = pos + 4,
             .sumVersion = version,
-            .result = binaryRangeToDecimal(stream, headerLength + 1, pos + 4, true)
+            .result = binaryRangeToDecimal(stream, headerLastBitIndex + 1, pos + 4, true)
         };
     } else {
         int lengthTypeId = binaryRangeToDecimal(stream, start + 6, start + 6, false);
@@ -103,31 +102,29 @@ PacketReturnData readPacket(char *stream, int start, int length) {
 
         if (lengthTypeId == 0) {
             packetsLength = binaryRangeToDecimal(stream, start + 7, start + 7 + 14, false);
-            headerLength = start + 5 + 1 + 15;
+            headerLastBitIndex = start + 5 + 1 + 15;
         } else {
             packetsLength = binaryRangeToDecimal(stream, start + 7, start + 7 + 10, false);
-            headerLength = start + 5 + 1 + 11;
+            headerLastBitIndex = start + 5 + 1 + 11;
         }
 
         PacketReturnData subpackets[1000];
-        int packetIndex = 0;
-        int pos = headerLength + 1;
-        int sumVersion = version;
 
-        while ((lengthTypeId == 0 && (headerLength + packetsLength) > pos) || (lengthTypeId == 1 && packetIndex < packetsLength)) {
+        int packetIndex = 0;
+        int pos = headerLastBitIndex + 1;
+        int sumVersion = version;
+        long result = 0;
+
+        while ((lengthTypeId == 0 && (headerLastBitIndex + packetsLength) > pos) || (lengthTypeId == 1 && packetIndex < packetsLength)) {
             subpackets[packetIndex] = readPacket(stream, pos, length);
             pos = subpackets[packetIndex].lastBitIndex + 1;
             sumVersion += subpackets[packetIndex].sumVersion;
             packetIndex++;
         }
 
-        pos = lengthTypeId == 0 ? headerLength + packetsLength : pos - 1;
-
-        long result = 0;
-
         if (typeId == 0) {
             result = 0;
-            
+
             for (int i = 0; i < packetIndex; i++) {
                 result += subpackets[i].result;
             }
@@ -160,7 +157,7 @@ PacketReturnData readPacket(char *stream, int start, int length) {
         }
 
         return PacketReturnData{
-            .lastBitIndex = pos,
+            .lastBitIndex = lengthTypeId == 0 ? headerLastBitIndex + packetsLength : pos - 1,
             .sumVersion = sumVersion,
             .result = result,
         };
